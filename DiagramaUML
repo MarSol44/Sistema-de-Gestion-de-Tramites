@@ -1,0 +1,151 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+'======================= CONTROLADOR =======================
+class SistemaGestion {
+  - listaGeneralExpedientes : ListaDobleExpedientes
+  - arbolDependencias : arbol
+  - listaAlertas : ListaCircularAlertas
+  - correlativoExpediente : int
+  + registrarNuevoExpediente(...)
+  + finalizarExpediente(...)
+  + moverExpediente(...)
+  + mostrarTodosLosExpedientes()
+  + consultarSeguimiento(id)
+  + buscarPorId(id): Expediente
+  + getNombresDeDependencias(): ArrayList<String>
+  + getListaGeneralExpedientes(): ListaDobleExpedientes
+  + validarCredenciales(user, pass)
+}
+
+'======================= ESTRUCTURAS =======================
+class ListaDobleExpedientes {
+  - cabeza : NodoDobleExpediente
+  - cola : NodoDobleExpediente
+  + insertar(Expediente)
+  + buscarPorId(String): Expediente
+  + imprimirTodo()
+}
+
+class NodoDobleExpediente {
+  - dato : Expediente
+  - anterior : NodoDobleExpediente
+  - siguiente : NodoDobleExpediente
+}
+
+class ListaCircularAlertas {
+  - cabeza : NodoCircular
+  + insertarOrdenado(Expediente)
+  + remover(id)
+  + mostrarAlertas()
+}
+
+class NodoCircular {
+  - dato : Expediente
+  - siguiente : NodoCircular
+}
+
+class arbol {
+  - raiz : nodoArbol
+  + insertar(dependencia, idPadre)
+  + imprimirJerarquia()
+  + llenarNombres(lista)
+}
+
+class nodoArbol {
+  - dato : dependencia
+  - hijos : listaSimpleHijos
+  + agregarHijo(nodoArbol)
+  + getDato()
+  + getHijos()
+}
+
+class listaSimpleHijos {
+  - cabeza : nodoDeLista
+  + insertar(nodoArbol)
+  + getCabeza()
+}
+
+class nodoDeLista {
+  - dato : nodoArbol
+  - siguiente : nodoDeLista
+}
+
+'======================= MODELO =======================
+class Expediente {
+  - idUnico : String
+  - prioridad : int
+  - asunto : String
+  - estado : String
+  - docReferencia : String
+  - interesado : Interesados
+  - seguimiento : ListaSimpleMovimientos
+  + getSeguimiento()
+  + getEstado()
+  + getIdUnico()
+  + setEstado(String)
+  + setFechaFin(LocalDateTime)
+}
+
+class Interesados {
+  - dni : String
+  - nombre : String
+  - telefono : String
+  - email : String
+  - tipo : String
+  + getDni()
+  + getNombre()
+  + getTelefono()
+  + getEmail()
+}
+
+class ListaSimpleMovimientos {
+  - cabeza : NodoSimpleMovimiento
+  + insertar(Movimiento)
+  + imprimirMovimientos()
+}
+
+class NodoSimpleMovimiento {
+  - dato : Movimiento
+  - siguiente : NodoSimpleMovimiento
+}
+
+class Movimiento {
+  - fechaHora : LocalDateTime
+  - descripcion : String
+}
+
+class dependencia {
+  - id : int
+  - nombre : String
+  + getId()
+  + getNombre()
+}
+
+'======================= RELACIONES CON MULTIPLICIDAD =======================
+
+SistemaGestion "1" *-- "1" ListaDobleExpedientes
+SistemaGestion "1" *-- "1" ListaCircularAlertas
+SistemaGestion "1" *-- "1" arbol
+SistemaGestion ..> "1" Expediente : usar()
+SistemaGestion ..> "1" Movimiento : crear()
+SistemaGestion ..> "1" dependencia : crear()
+
+ListaDobleExpedientes "1" o-- "0..*" NodoDobleExpediente
+NodoDobleExpediente "1" *-- "1" Expediente
+
+Expediente "1" *-- "1" Interesados
+Expediente "1" *-- "1" ListaSimpleMovimientos
+ListaSimpleMovimientos "1" o-- "0..*" NodoSimpleMovimiento
+NodoSimpleMovimiento "1" *-- "1" Movimiento
+
+ListaCircularAlertas "1" o-- "0..*" NodoCircular
+NodoCircular "1" *-- "1" Expediente
+
+arbol "1" *-- "1" nodoArbol
+nodoArbol "1" *-- "1" dependencia
+nodoArbol "1" *-- "1" listaSimpleHijos
+listaSimpleHijos "1" o-- "0..*" nodoDeLista
+nodoDeLista "1" *-- "1" nodoArbol
+
+@enduml
